@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "easysearch-lo": "node ./easysearch/lei-ordinaria/index.js"
+    "easysearch-lo": "node ./easysearch/lei-ordinaria/index.js",
+    "easysearch-lc": "node ./easysearch/lei-complementar/index.js"
   },
   "dependencies": {
     "puppeteer": "^21.7.0"
