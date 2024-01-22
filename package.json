@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "easysearch-lo": "node ./easysearch/lei-ordinaria/index.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.7.0"
+  }
+}
