@@ -22,8 +22,8 @@ const fs = require('fs');
         var pageResults = []
         try {
             const startPage = 1; // Default: 1
-            const finishPage = 2; // Default: 0
-            const firstPageRow = 98; // Default: 0
+            const finishPage = 0; // Default: 0
+            const firstPageRow = 0; // Default: 0
             // const maxRetry = 3; // Default: 3
 
             log("Showing 'results per page' dropdown");
