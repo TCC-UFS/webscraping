@@ -1,7 +1,7 @@
 # Results
 ## EasySearch
-easysearch/lei-ordinaria/*.json
-easysearch/lei-complementar/*.json
+easysearch/lei-ordinaria/data/
+easysearch/lei-complementar/data/
 
 # Logs
 logs

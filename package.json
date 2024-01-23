@@ -1,9 +1,17 @@
 {
   "scripts": {
-    "easysearch-lo": "node ./easysearch/lei-ordinaria/index.js",
-    "easysearch-lc": "node ./easysearch/lei-complementar/index.js"
+    "extract-se-lo": "node ./easysearch/lei-ordinaria/extract.js",
+    "extract-se-lc": "node ./easysearch/lei-complementar/extract.js",
+    "merge-se": "node ./easysearch/mergeResults.js",
+    "filter-se-lo": "node ./easysearch/lei-ordinaria/filter.js",
+    "filter-se-lc": "node ./easysearch/lei-complementar/filter.js",
+    "transform-se-lo": "node ./easysearch/lei-ordinaria/transform.js",
+    "transform-se-lc": "node ./easysearch/lei-complementar/transform.js",
+    "load-se-lo": "node ./easysearch/lei-ordinaria/load.js",
+    "load-se-lc": "node ./easysearch/lei-complementar/load.js"
   },
   "dependencies": {
+    "axios": "^1.6.5",
     "puppeteer": "^21.7.0"
   }
 }

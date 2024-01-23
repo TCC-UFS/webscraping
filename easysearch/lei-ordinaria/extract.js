@@ -1,12 +1,18 @@
 const puppeteer = require('puppeteer');
 const utils = require('../../utils');
 const fs = require('fs');
+const retry = require('./retry.json');
 
 (async () => {
     console.log("Starting Application...");
-    const browser = await puppeteer.launch({headless: false});
+    const browser = await puppeteer.launch({
+        headless: false,
+        timeout: false,
+        protocolTimeout: false,
+        args: ['--no-sandbox']
+    });
     const page = await browser.newPage();
-
+    
     await page.goto('http://acervo.se.gov.br/easysearch/');
     await page.setViewport({width: 910, height: 800});
     await page.exposeFunction("wait", utils.wait);
@@ -14,17 +20,17 @@ const fs = require('fs');
     await page.exposeFunction("time", console.time);
     await page.exposeFunction("timeEnd", console.timeEnd);
     await page.exposeFunction("writeFile", fs.writeFileSync);
-
+    
     utils.wait(0.5);
     
-    await page.evaluate(async () => {
+    await page.evaluate(async (retry) => {
         var errors = []
         var pageResults = []
+        
         try {
             const startPage = 1; // Default: 1
             const finishPage = 0; // Default: 0
             const firstPageRow = 0; // Default: 0
-            // const maxRetry = 3; // Default: 3
 
             log("Showing 'results per page' dropdown");
             await document.querySelectorAll("div.GPFMNGWNP")[4].children[17].children[0].click();
@@ -33,15 +39,15 @@ const fs = require('fs');
             log("Showing list from 'Secretaria de Estado de Governo'");
             await wait(0.8)
             await document.querySelectorAll("div.GPFMNGWBLB")[0].children[1].children[0].children[1].click();
-            log("Selects 'Lei Complementar' filter");
+            log("Selects 'Lei Ordinária' filter");
             await wait(0.8)
-            await document.querySelectorAll("div.GPFMNGWBLB")[0].children[1].children[1].children[2].children[0].children[4].click();
+            await document.querySelectorAll("div.GPFMNGWBLB")[0].children[1].children[1].children[1].children[0].children[4].click();
             await wait(0.8)
             
             var pages = document.querySelectorAll("div.GPFMNGWNP")[4].children[7].textContent.split(' ')[1];
             const pressEnterEvent = new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, which: 13 });
 
-            log("\n------------------------------\n      'Leis Complementares'      \n------------------------------");
+            log("\n------------------------------\n      'Leis Ordinárias'      \n------------------------------");
             if (startPage !== 1) {
                 document.querySelectorAll("div.GPFMNGWNP")[4].children[6].value = startPage;
                 document.querySelectorAll("div.GPFMNGWNP")[4].children[6].dispatchEvent(pressEnterEvent)
@@ -49,17 +55,16 @@ const fs = require('fs');
             }
 
             time("\nExtraction Completed in");
-            // let retries = [];
             for (var i = startPage-1; i < parseInt(pages) && (finishPage === 0 || i < finishPage); i++) {
                 try {
                     time(`Extraction from Page ${i+1} completed in`);
                     log(`\nStarting extraction from Page ${i+1}.`);
                     let results = await document.querySelectorAll("div.GPFMNGWLHC")[2].children[0].children[1].children[0].children[0].children[0].children[0].children;
                     wait(0.2);
-                    
+
                     let startRow = 0;
                     if (i === startPage-1) startRow = firstPageRow;
-                    
+
                     let atos = [];
                     for(var j = startRow; j < results.length; j++) {
                         try {
@@ -124,24 +129,18 @@ const fs = require('fs');
                             }
 
                             // LOG ROWS
-                            // log({ row: j, ato: metadata.nrAto, contentLength: content.length });
+                            log({ row: j, ato: metadata.nrAto, content: content.length });
                         }
                         catch (err) {
-                            let errMsg = `\nError on page ${i+1}, row ${j}.\n${err.message}`;
-                            log(errMsg);
+                            let errMsg = `Error on page ${i+1}, row ${j}.\n${err.message}`;
                             errors.push(errMsg);
-                            
-                            // Retry Attempts
-                            // if ((retries[`${i}x${j}`] || 0) < maxRetry) {
-                            //     retries[`${i}x${j}`] = retries[`${i}x${j}`] ? retries[`${i}x${j}`]+1 : 1;
-                            //     log(`Retrying x${retries[`${i}x${j}`]}...\n`);
-                            //     j--;
-                            // }else
+                            log(errMsg);
                         }
                     }
 
                     pageResults = pageResults.concat(atos);
                     timeEnd(`Extraction from Page ${i+1} completed in`);
+                    await writeFile(`./easysearch/lei-ordinaria/data/backup-pages/p${i+1}.json`, JSON.stringify({ errors, atos }, null, 4));
 
                     if (i+1 !== parseInt(pages)) {
                         await document.querySelectorAll("div.GPFMNGWNP")[4].children[9].children[0].children[0].children[0].children[1].click()
@@ -159,10 +158,10 @@ const fs = require('fs');
         }
         catch (err) {
             log(`\nApplication Crashed!\n${err.message}`);
-            await writeFile("./easysearch/lei-complementar/backup.json", JSON.stringify({ errors, pageResults }, null, 4));
+            await writeFile("./easysearch/lei-ordinaria/data/backup.json", JSON.stringify({ errors, pageResults }, null, 4));
             throw err;
         }
-    })
+    }, (retry))
     .then(async response => {
         let results = { data: response.pageResults };
         let errors = { data: response.errors };
@@ -170,8 +169,8 @@ const fs = require('fs');
         let resultsJSON = JSON.stringify(results, null, 4);
         let errorsJSON = JSON.stringify(errors, null, 4);
 
-        await fs.writeFileSync('./easysearch/lei-complementar/results.json', resultsJSON);
-        await fs.writeFileSync('./easysearch/lei-complementar/errors.json', errorsJSON);
+        await fs.writeFileSync('./easysearch/lei-ordinaria/data/results.json', resultsJSON);
+        await fs.writeFileSync('./easysearch/lei-ordinaria/data/errors.json', errorsJSON);
     })
     .catch(err => {
         throw err;
