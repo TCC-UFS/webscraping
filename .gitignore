@@ -3,6 +3,12 @@
 easysearch/lei-ordinaria/data/
 easysearch/lei-complementar/data/
 
+rhnet/lei-ordinaria/data/
+rhnet/lei-complementar/data/
+
+planalto/lei-ordinaria/data/
+planalto/lei-complementar/data/
+
 # Logs
 logs
 *.log
