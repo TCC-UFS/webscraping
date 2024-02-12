@@ -9,6 +9,7 @@
     "transform-se-lc": "node ./easysearch/lei-complementar/transform.js",
     "load-se-lo": "node ./easysearch/lei-ordinaria/load.js",
     "load-se-lc": "node ./easysearch/lei-complementar/load.js",
+
     "extract-am-lo": "node ./rhnet/lei-ordinaria/extract.js",
     "extract-am-lc": "node ./rhnet/lei-complementar/extract.js",
     "filter-am-lo": "node ./rhnet/lei-ordinaria/filter.js",
@@ -16,7 +17,15 @@
     "transform-am-lo": "node ./rhnet/lei-ordinaria/transform.js",
     "transform-am-lc": "node ./rhnet/lei-complementar/transform.js",
     "load-am-lo": "node ./rhnet/lei-ordinaria/load.js",
-    "load-am-lc": "node ./rhnet/lei-complementar/load.js"
+    "load-am-lc": "node ./rhnet/lei-complementar/load.js",
+    
+    "extract-br-lo": "node ./planalto/lei-ordinaria/extract.js",
+    "extract-br-lc": "node ./planalto/lei-complementar/extract.js",
+    "merge-br": "node ./planalto/lei-ordinaria/merge.js",
+    "transform-br-lo": "node ./planalto/lei-ordinaria/transform.js",
+    "transform-br-lc": "node ./planalto/lei-complementar/transform.js",
+    "load-br-lo": "node ./planalto/lei-ordinaria/load.js",
+    "load-br-lc": "node ./planalto/lei-complementar/load.js"
   },
   "dependencies": {
     "axios": "^1.6.5",
